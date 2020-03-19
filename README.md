@@ -1,4 +1,5 @@
-# sameuser.py - Exploring Users With Multiple Accounts In BloodHound
+# sameuser.py
+## Exploring Users With Multiple Accounts In BloodHound
 See the coresponding blog post HERE
 
 ```
