@@ -1,6 +1,5 @@
 # sameuser.py
-## Exploring Users With Multiple Accounts In BloodHound
-See the coresponding blog post HERE
+See the coresponding blog post Exploring Users With Multiple Accounts In BloodHound
 
 ```
 usage: sameuser.py [-h] [--same-csv SAME_CSV]
