@@ -1,5 +1,5 @@
 # sameuser.py
-See the coresponding blog post Exploring Users With Multiple Accounts In BloodHound
+See the companion blog post [Exploring Users With Multiple Accounts In BloodHound](https://insomniasec.com/blog/bloodhound-shared-accounts).
 
 ```
 usage: sameuser.py [-h] [--same-csv SAME_CSV]
