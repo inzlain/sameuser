@@ -1,8 +1,5 @@
 # sameuser.py
 
-## IMPROVED VERSION OF https://github.com/inzlain/sameuser
-
-
 See the companion blog post [Exploring Users With Multiple Accounts In BloodHound](https://insomniasec.com/blog/bloodhound-shared-accounts).
 
 ```
