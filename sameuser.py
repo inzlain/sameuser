@@ -6,7 +6,7 @@ import csv
 
 uri = 'bolt://127.0.0.1:7687'
 username = 'neo4j'
-password = 'changeme'
+password = 'exegol4thewin' # YOU NEED TO CHANGE THAT
 driver = GraphDatabase.driver(uri, auth=(username, password), encrypted=False)
 
 parser = argparse.ArgumentParser()
@@ -27,7 +27,7 @@ def all_usernames():
     session = driver.session()
     users = []
     result = session.run('MATCH (u:User) RETURN u.name')
-    for record in result.records():
+    for record in result:
         username = record.get('u.name')
         if username != None:
             users.append(username)
@@ -52,7 +52,7 @@ def same_add(user_a, user_b):
             # Add a SameUser relationship between the users
             query = 'MATCH (a:User {{name:"{0}"}}), (b:User {{name:"{1}"}}) MERGE (a)-[r1:SameUser]->(b)-[r2:SameUser]->(a) RETURN a.name, b.name'.format(user_a, user_b)
             result = session.run(query)
-            new_relationships = result.summary().counters.relationships_created
+            new_relationships = result.consume().counters.relationships_created
             if new_relationships != 0:
                 print(' added SameUser relationship')
             else:
@@ -85,7 +85,7 @@ def same_username():
                 if username != "KRBTGT@" and username != "ADMINISTRATOR@" and username != "GUEST@":
                     query = 'MATCH (b:User) WHERE (b.name STARTS WITH "{0}" AND NOT b.name = "{1}") RETURN b.name'.format(username, user_a)
                     result = session.run(query)
-                    for record in result.records():
+                    for record in result:
                         same_add(user_a, record.get('b.name'))
     session.close
 
@@ -93,7 +93,7 @@ def same_displayname():
     session = driver.session()
     displaynames = []
     result = session.run('MATCH (u:User) RETURN u.displayname, COUNT(u.displayname)')
-    for record in result.records():
+    for record in result:
         if record.get('COUNT(u.displayname)') > 1:
             displaynames.append(record.get('u.displayname'))
     for displayname in displaynames:
@@ -101,7 +101,7 @@ def same_displayname():
             users = []
             query = 'MATCH (u:User) WHERE u.displayname = "{0}" RETURN u.name'.format(displayname)
             result = session.run(query)
-            for record in result.records():
+            for record in result:
                 users.append(record.get('u.name'))
             for user_combination in list(combinations(users, 2)):
                 same_add(user_combination[0], user_combination[1])
@@ -111,7 +111,7 @@ def same_email():
     session = driver.session()
     emails = []
     result = session.run('MATCH (u:User) RETURN u.email, COUNT(u.email)')
-    for record in result.records():
+    for record in result:
         if record.get('COUNT(u.email)') > 1:
             emails.append(record.get('u.email'))
     for email in emails:
@@ -119,7 +119,7 @@ def same_email():
             users = []
             query = 'MATCH (u:User) WHERE u.email = "{0}" RETURN u.name'.format(email)
             result = session.run(query)
-            for record in result.records():
+            for record in result:
                 users.append(record.get('u.name'))
             for user_combination in list(combinations(users, 2)):
                 same_add(user_combination[0], user_combination[1])
@@ -130,7 +130,7 @@ def shared_password():
     session = driver.session()
     query = 'MATCH (a:User), (b:User), p=(a)-[r:SameUser]-(b) WHERE a.pwdlastset < b.pwdlastset+{0} AND a.pwdlastset > b.pwdlastset-{0} AND a.pwdlastset > 0 AND b.pwdlastset > 0 MERGE (a)-[r1:SharedPassword]->(b)-[r2:SharedPassword]->(a) RETURN a.name, b.name'
     result = session.run(query.format(time_window))
-    new_relationships = result.summary().counters.relationships_created
+    new_relationships = result.consume().counters.relationships_created
     if new_relationships != 0:
         print('Added SharedPassword relationships between {0} user pairs'.format(int(new_relationships / 2)))
     else:
